@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/NoahAmethyst/dispatch-center/task"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 	"os"
@@ -17,8 +18,9 @@ func gracefulShutdown(_ context.Context, _ *grpc.Server) {
 		sig := <-signalChannel
 		defer close(signalChannel)
 		log.Info().Msgf("receive signal:%+v,graceful shutdown", sig)
-		// Shut down grpc server
-		//server.GracefulStop()
+
+		//Save odaily sent record
+		task.OdailySentRecord.SaveData()
 
 		log.Info().Msgf("graceful shutdown done")
 

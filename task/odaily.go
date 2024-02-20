@@ -47,6 +47,7 @@ func (o *odailySent) Exist(id int64) bool {
 }
 
 func (o *odailySent) SaveData() {
+	log.Info().Msgf("Save odaily sent record data")
 	path := file_util.GetFileRoot()
 	if _, err := file_util.WriteJsonFile(o.ids, path, "odailySentRecord", false); err != nil {
 		log.Error().Msgf("Save odaily news faield:%s", err.Error())
@@ -130,6 +131,8 @@ func init() {
 		_err := file_util.TCCosDownload("cache", "odailySentRecord.json", fmt.Sprintf("%s/%s", path, "odailySentRecord.json"))
 		if _err == nil {
 			_ = file_util.LoadJsonFile(fmt.Sprintf("%s/odailySentRecord.json", path), &sentRecord)
+		} else {
+			log.Error().Msgf("Load odaily sent record data from Tencent COS faied:%s", _err.Error())
 		}
 	}
 }
