@@ -112,6 +112,7 @@ func PushOdailyNews(ctx context.Context, bot dispatch_pb.Bot) {
 }
 
 func RegisterTask(ctx context.Context, bot dispatch_pb.Bot, taskDuration string) {
+	log.Info().Msgf("Register Odaily news push task. Bot[%d]", bot)
 	task := func() {
 		PushOdailyNews(ctx, bot)
 	}

@@ -21,7 +21,7 @@ var conn map[GRPCClientName]*grpc.ClientConn
 var RpcCliList []GRPCClientName
 
 func init() {
-	RpcCliList = []GRPCClientName{CliQQBot}
+	RpcCliList = []GRPCClientName{CliQQBot, CLISpider}
 	conn = make(map[GRPCClientName]*grpc.ClientConn)
 }
 
