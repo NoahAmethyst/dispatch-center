@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "dispatch_pb/;dispatch_pb";
+
+service DispatchService {
+  rpc Push(Message)returns(Resp);
+}
+
+
+message Resp{
+  string error_message = 1;
+  bool success = 2;
+}
+
+message Message{
+  MetaMessage meta = 1;
+  QQMessage qq = 2;
+  DingdingMessage dingding = 3;
+  Bot t = 4;
+}
+
+message MetaMessage{
+  string content = 2;
+  string title = 3;
+  string reference_url = 4;
+}
+
+message QQMessage{
+  int64 chat = 1;
+  bool group = 2;
+}
+
+message DingdingMessage{
+  string accessToken = 1;
+  DingMType mt = 2;
+}
+
+enum DingMType{
+  Text = 0;
+  Link = 2;
+  Markdown = 3;
+}
+
+
+
+
+enum Bot{
+  None = 0;
+  QQ = 1;
+  Wechat = 2;
+  Telegram = 3;
+  Dingding = 4;
+  Feishu = 5;
+}
+
+
