@@ -14,7 +14,7 @@ type dingCli struct {
 	Dingtalk *dingtalk.DingTalk
 	Interval time.Duration
 	sync.Once
-	revcMessage chan *dispatch_pb.Message
+	revcMessage chan dispatch_pb.Message
 }
 
 var DingCli *dingCli
@@ -23,7 +23,7 @@ func init() {
 	DingCli = &dingCli{
 		Interval:    time.Second * 3,
 		Once:        sync.Once{},
-		revcMessage: make(chan *dispatch_pb.Message, 100),
+		revcMessage: make(chan dispatch_pb.Message, 100),
 	}
 	token := os.Getenv(constant.DING_TOKEN)
 	secret := os.Getenv(constant.DING_SECRET)
@@ -54,11 +54,7 @@ func (c *dingCli) Send(title, content, referenceUrl string, t dispatch_pb.DingMT
 
 }
 
-func (c *dingCli) Push(message *dispatch_pb.Message) error {
-
-	go func(_message *dispatch_pb.Message) {
-		c.revcMessage <- _message
-	}(message)
+func (c *dingCli) Push(message dispatch_pb.Message) error {
 
 	c.Once.Do(func() {
 		for {
@@ -72,6 +68,10 @@ func (c *dingCli) Push(message *dispatch_pb.Message) error {
 			}
 		}
 	})
+
+	go func(_message dispatch_pb.Message) {
+		c.revcMessage <- _message
+	}(message)
 
 	return nil
 
