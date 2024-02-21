@@ -57,7 +57,7 @@ func (c *dingCli) Send(title, content, referenceUrl string, t dispatch_pb.DingMT
 func (c *dingCli) Push(message *dispatch_pb.Message) error {
 
 	go func(_message *dispatch_pb.Message) {
-		c.revcMessage <- message
+		c.revcMessage <- _message
 	}(message)
 
 	c.Once.Do(func() {
