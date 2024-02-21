@@ -8,10 +8,10 @@ import (
 )
 
 type ISender interface {
-	Push(message dispatch_pb.Message) error
+	Push(message *dispatch_pb.Message) error
 }
 
-func Push(message dispatch_pb.Message) error {
+func Push(message *dispatch_pb.Message) error {
 	var iSender ISender
 	switch message.T {
 	case dispatch_pb.Bot_Dingding:

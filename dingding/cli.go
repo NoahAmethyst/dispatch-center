@@ -14,7 +14,7 @@ type dingCli struct {
 	Dingtalk *dingtalk.DingTalk
 	Interval time.Duration
 	sync.Once
-	revcMessage chan dispatch_pb.Message
+	revcMessage chan *dispatch_pb.Message
 }
 
 var DingCli *dingCli
@@ -23,7 +23,7 @@ func init() {
 	DingCli = &dingCli{
 		Interval:    time.Second * 3,
 		Once:        sync.Once{},
-		revcMessage: make(chan dispatch_pb.Message, 100),
+		revcMessage: make(chan *dispatch_pb.Message, 100),
 	}
 	token := os.Getenv(constant.DING_TOKEN)
 	secret := os.Getenv(constant.DING_SECRET)
@@ -54,24 +54,27 @@ func (c *dingCli) Send(title, content, referenceUrl string, t dispatch_pb.DingMT
 
 }
 
-func (c *dingCli) Push(message dispatch_pb.Message) error {
+func (c *dingCli) Push(message *dispatch_pb.Message) error {
 
-	c.Once.Do(func() {
-		for {
-			select {
-			case msg := <-c.revcMessage:
-				time.Sleep(c.Interval)
-				if err := c.Send(msg.Meta.GetTitle(), msg.Meta.GetContent(), msg.Meta.GetReferenceUrl(), msg.Dingding.GetMt()); err != nil {
-					log.Error().Msgf("Send dingtalk failed:%s", err.Error())
-					_ = c.Push(msg)
-				}
-			}
-		}
-	})
-
-	go func(_message dispatch_pb.Message) {
+	go func(_message *dispatch_pb.Message) {
 		c.revcMessage <- _message
 	}(message)
+
+	c.Once.Do(func() {
+		go func() {
+			for {
+				select {
+				case msg := <-c.revcMessage:
+					time.Sleep(c.Interval)
+					if err := c.Send(msg.Meta.GetTitle(), msg.Meta.GetContent(), msg.Meta.GetReferenceUrl(), msg.Dingding.GetMt()); err != nil {
+						log.Error().Msgf("Send dingtalk failed:%s", err.Error())
+						_ = c.Push(msg)
+					}
+				}
+			}
+		}()
+
+	})
 
 	return nil
 

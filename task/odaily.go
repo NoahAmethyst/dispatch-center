@@ -110,11 +110,12 @@ func PushOdailyNews(ctx context.Context, bot dispatch_pb.Bot) {
 		message.Meta.Content = fmt.Sprintf(markdownTemplate, odailyFeed.Title, message.Meta.ReferenceUrl,
 			odailyFeed.Description, publishdeAt.Format(df))
 
-		if err := sender.Push(message); err != nil {
+		if err := sender.Push(&message); err != nil {
 			log.Error().Msgf("Task:Send odaily feed failed:%s", err.Error())
 		} else {
 			OdailySentRecord.Put(odailyFeed.Id)
 		}
+
 	}
 }
 
@@ -142,5 +143,7 @@ func init() {
 		} else {
 			log.Error().Msgf("Load odaily sent record data from Tencent COS faied:%s", _err.Error())
 		}
+	} else {
+		log.Info().Msgf("load odaily sent record,size:%d", len(sentRecord))
 	}
 }
