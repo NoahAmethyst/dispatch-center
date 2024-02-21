@@ -6,14 +6,13 @@ import (
 	"os"
 	"runtime"
 	"strconv"
-	"time"
 )
 
 func init() {
 
-	zerolog.TimeFieldFormat = time.DateTime
+	zerolog.TimeFieldFormat = "2006-01-02 15:04:05"
 	zerolog.SetGlobalLevel(zerolog.InfoLevel)
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.DateTime})
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: "2006-01-02 15:04:05"})
 }
 
 func Error() *zerolog.Event {
