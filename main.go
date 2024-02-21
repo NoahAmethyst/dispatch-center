@@ -14,7 +14,7 @@ import (
 
 func main() {
 	//Set time location to East eighth District
-	time.Local = time.FixedZone("UTC", 8*60*60)
+	time.Local = time.FixedZone("UTC", 0)
 
 	ctx := context.Background()
 

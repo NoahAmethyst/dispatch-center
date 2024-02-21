@@ -116,7 +116,6 @@ func PushOdailyNews(ctx context.Context, bot dispatch_pb.Bot) {
 			OdailySentRecord.Put(odailyFeed.Id)
 		}
 	}
-
 }
 
 func RegisterTask(ctx context.Context, bot dispatch_pb.Bot, taskDuration string) {
