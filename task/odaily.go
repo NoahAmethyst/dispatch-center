@@ -146,4 +146,6 @@ func init() {
 	} else {
 		log.Info().Msgf("load odaily sent record,size:%d", len(sentRecord))
 	}
+
+	OdailySentRecord.ids = sentRecord
 }
