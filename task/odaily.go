@@ -112,8 +112,9 @@ func PushOdailyNews(ctx context.Context, bot dispatch_pb.Bot) {
 
 		if err := sender.Push(&message); err != nil {
 			log.Error().Msgf("Task:Send odaily feed failed:%s", err.Error())
+		} else {
+			OdailySentRecord.Put(odailyFeed.Id)
 		}
-		OdailySentRecord.Put(odailyFeed.Id)
 	}
 
 }
