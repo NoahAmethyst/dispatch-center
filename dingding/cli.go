@@ -23,7 +23,7 @@ func init() {
 	DingCli = &dingCli{
 		Interval:    time.Second * 3,
 		Once:        sync.Once{},
-		revcMessage: make(chan *dispatch_pb.Message),
+		revcMessage: make(chan *dispatch_pb.Message, 100),
 	}
 	token := os.Getenv(constant.DING_TOKEN)
 	secret := os.Getenv(constant.DING_SECRET)

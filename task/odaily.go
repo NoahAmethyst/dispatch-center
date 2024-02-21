@@ -128,11 +128,11 @@ func RegisterTask(ctx context.Context, bot dispatch_pb.Bot, taskDuration string)
 
 func init() {
 	OdailySentRecord = odailySent{
-		ids:     make([]int64, 0, 200),
-		max:     200,
+		ids:     make([]int64, 0, 500),
+		max:     500,
 		RWMutex: sync.RWMutex{},
 	}
-	sentRecord := make([]int64, 0, 200)
+	sentRecord := make([]int64, 0, OdailySentRecord.max)
 	path := file_util.GetFileRoot()
 	if err := file_util.LoadJsonFile(fmt.Sprintf("%s/odailySentRecord.json", path), &sentRecord); err != nil {
 		log.Info().Msgf("retry load odailySentRecord json from tencent cos")
