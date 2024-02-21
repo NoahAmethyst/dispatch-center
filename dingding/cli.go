@@ -11,18 +11,19 @@ import (
 )
 
 type dingCli struct {
-	sync.RWMutex
-	Dingtalk          *dingtalk.DingTalk
-	Interval          int64
-	LastPushTimestamp int64
+	Dingtalk *dingtalk.DingTalk
+	Interval time.Duration
+	sync.Once
+	revcMessage chan *dispatch_pb.Message
 }
 
 var DingCli *dingCli
 
 func init() {
 	DingCli = &dingCli{
-		RWMutex:  sync.RWMutex{},
-		Interval: 60 / 20,
+		Interval:    time.Second * 3,
+		Once:        sync.Once{},
+		revcMessage: make(chan *dispatch_pb.Message),
 	}
 	token := os.Getenv(constant.DING_TOKEN)
 	secret := os.Getenv(constant.DING_SECRET)
@@ -34,20 +35,7 @@ func init() {
 }
 
 func (c *dingCli) Send(title, content, referenceUrl string, t dispatch_pb.DingMType) error {
-	c.Lock()
 	var err error
-	defer func() {
-		if err == nil {
-			c.LastPushTimestamp = time.Now().Unix()
-		}
-		c.Unlock()
-	}()
-	now := time.Now().Unix()
-	interval := now - c.LastPushTimestamp
-	if interval < c.Interval {
-		time.Sleep(time.Duration(interval) * time.Second)
-	}
-
 	switch t {
 	case dispatch_pb.DingMType_Text:
 		err = c.Dingtalk.SendTextMessage(content)
@@ -67,5 +55,24 @@ func (c *dingCli) Send(title, content, referenceUrl string, t dispatch_pb.DingMT
 }
 
 func (c *dingCli) Push(message *dispatch_pb.Message) error {
-	return c.Send(message.Meta.GetTitle(), message.Meta.GetContent(), message.Meta.GetReferenceUrl(), message.Dingding.GetMt())
+
+	go func(_message *dispatch_pb.Message) {
+		c.revcMessage <- message
+	}(message)
+
+	c.Once.Do(func() {
+		for {
+			select {
+			case msg := <-c.revcMessage:
+				time.Sleep(c.Interval)
+				if err := c.Send(msg.Meta.GetTitle(), msg.Meta.GetContent(), msg.Meta.GetReferenceUrl(), msg.Dingding.GetMt()); err != nil {
+					log.Error().Msgf("Send dingtalk failed:%s", err.Error())
+					_ = c.Push(msg)
+				}
+			}
+		}
+	})
+
+	return nil
+
 }
