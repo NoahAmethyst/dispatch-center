@@ -100,6 +100,13 @@ func PushOdailyNews(ctx context.Context, bot dispatch_pb.Bot) {
 
 		publishdeAt := time.Unix(odailyFeed.PublishedAt, 0)
 
+		if loc, err := time.LoadLocation("Asia/Shanghai"); err != nil {
+			log.Error().Msgf("Set time location failed:%s", err.Error())
+		} else {
+			// Convert Time to East 8 District
+			publishdeAt = publishdeAt.In(loc)
+		}
+
 		message.Meta.Content = fmt.Sprintf(markdownTemplate, odailyFeed.Title, message.Meta.ReferenceUrl,
 			odailyFeed.Description, publishdeAt.Format(df))
 
