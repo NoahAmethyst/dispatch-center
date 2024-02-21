@@ -6,8 +6,6 @@ RUN go env -w GO111MODULE=on \
   && go env -w CGO_ENABLED=0
 #  && go env -w GOPROXY=https://goproxy.cn,direct
 
-RUN apk update && apk add tzdata
-
 WORKDIR /opt
 
 COPY ./ .
@@ -17,6 +15,8 @@ RUN go mod download
 RUN go build -o dispatch-center
 
 FROM alpine:3.17 AS app
+
+RUN apk update && apk add tzdata
 
 WORKDIR /opt
 
