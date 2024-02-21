@@ -6,6 +6,8 @@ RUN go env -w GO111MODULE=on \
   && go env -w CGO_ENABLED=0
 #  && go env -w GOPROXY=https://goproxy.cn,direct
 
+RUN apk update && apk add tzdata
+
 WORKDIR /opt
 
 COPY ./ .
