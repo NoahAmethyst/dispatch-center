@@ -10,6 +10,7 @@ import (
 	cron2 "github.com/NoahAmethyst/dispatch-center/utils/cron"
 	"github.com/NoahAmethyst/dispatch-center/utils/file_util"
 	"github.com/NoahAmethyst/dispatch-center/utils/log"
+	"strings"
 	"sync"
 	"time"
 )
@@ -108,7 +109,7 @@ func PushOdailyNews(ctx context.Context, bot dispatch_pb.Bot) {
 		//}
 
 		message.Meta.Content = fmt.Sprintf(markdownTemplate, odailyFeed.Title, message.Meta.ReferenceUrl,
-			odailyFeed.Description, publishdeAt.Format(df))
+			strings.ReplaceAll(odailyFeed.Description, "Odaily星球日报讯 ", ""), publishdeAt.Format(df))
 
 		if err := sender.Push(&message); err != nil {
 			log.Error().Msgf("Task:Send odaily feed failed:%s", err.Error())
